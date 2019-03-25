@@ -1,16 +1,16 @@
 const CliApp = require('../lib/cli-app')
-const TestRunner = require('test-runner')
 const a = require('assert')
 const createFixture = require('./lib/util').createFixture
 const fs = require('fs')
 const rimraf = require('rimraf')
 const path = require('path')
+const Tom = require('test-runner').Tom
 
-const runner = new TestRunner()
+const tom = module.exports = new Tom('cli')
 const testRoot = `tmp/${path.basename(__filename)}`
 rimraf.sync(testRoot)
 
-runner.test('cli: simple', function () {
+tom.test('simple', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', 'one', '--replace', 'yeah', fixturePath ]
@@ -22,7 +22,7 @@ runner.test('cli: simple', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), true)
 })
 
-runner.test('cli: simple, dry run', function () {
+tom.test('simple, dry run', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', 'one', '--replace', 'yeah', fixturePath, '--dry-run' ]
@@ -34,7 +34,7 @@ runner.test('cli: simple, dry run', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), false)
 })
 
-runner.test('cli: simple, using bin', function () {
+tom.test('simple, using bin', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', 'one', '--replace', 'yeah', fixturePath ]
@@ -45,7 +45,7 @@ runner.test('cli: simple, using bin', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), true)
 })
 
-runner.test('cli: simple, find string not found', function () {
+tom.test('simple, find string not found', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', 'o.e', '--replace', 'yeah', fixturePath ]
@@ -57,7 +57,7 @@ runner.test('cli: simple, find string not found', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), false)
 })
 
-runner.test('cli: simple regexp', function () {
+tom.test('simple regexp', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', '/o.e/', '--replace', 'yeah', fixturePath ]
@@ -69,7 +69,7 @@ runner.test('cli: simple regexp', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), true)
 })
 
-runner.test('cli: simple regexp, case sensitive', function () {
+tom.test('simple regexp, case sensitive', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/ONE`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', '/one/', '--replace', 'yeah', fixturePath ]
@@ -81,7 +81,7 @@ runner.test('cli: simple regexp, case sensitive', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), false)
 })
 
-runner.test('cli: simple regexp, insensitive', function () {
+tom.test('simple regexp, insensitive', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/ONE`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', '/one/i', '--replace', 'yeah', fixturePath ]
@@ -93,7 +93,7 @@ runner.test('cli: simple regexp, insensitive', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), true)
 })
 
-runner.test('cli: input file list on stdin', function () {
+tom.test('input file list on stdin', function () {
   const spawn = require('child_process').spawn
   const path = require('path')
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
@@ -108,7 +108,7 @@ runner.test('cli: input file list on stdin', function () {
   })
 })
 
-runner.test('cli: --help', function () {
+tom.test('--help', function () {
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--help' ]
   const cliApp = new CliApp()
@@ -121,7 +121,7 @@ runner.test('cli: --help', function () {
   process.argv = origArgv
 })
 
-runner.test('cli: --regexp, append extention', function () {
+tom.test('--regexp, append extention', function () {
   const testDir = `${testRoot}/${this.index}`
   createFixture(`${testDir}/one1`)
   createFixture(`${testDir}/one2`)
@@ -136,7 +136,7 @@ runner.test('cli: --regexp, append extention', function () {
   process.argv = origArgv
 })
 
-runner.test('cli: --regexp, single replace', function () {
+tom.test('--regexp, single replace', function () {
   const testDir = `${testRoot}/${this.index}`
   createFixture(`${testDir}/ooo`)
   const origArgv = process.argv
@@ -148,7 +148,7 @@ runner.test('cli: --regexp, single replace', function () {
   process.argv = origArgv
 })
 
-runner.test('cli: --regexp, global replace', function () {
+tom.test('--regexp, global replace', function () {
   const testDir = `${testRoot}/${this.index}`
   createFixture(`${testDir}/ooo`)
   const origArgv = process.argv
@@ -160,7 +160,7 @@ runner.test('cli: --regexp, global replace', function () {
   process.argv = origArgv
 })
 
-runner.test('cli: failed replace', function () {
+tom.test('failed replace', function () {
   const testDir = `${testRoot}/${this.index}`
   createFixture(`${testDir}/one`)
   createFixture(`${testDir}/two`)
@@ -175,7 +175,7 @@ runner.test('cli: failed replace', function () {
   process.argv = origArgv
 })
 
-runner.test('cli: simple, diff view', function () {
+tom.test('simple, diff view', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', 'one', '--replace', 'yeah', fixturePath, '--view', 'diff' ]
@@ -187,7 +187,7 @@ runner.test('cli: simple, diff view', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), true)
 })
 
-runner.test('cli: simple, long view', function () {
+tom.test('simple, long view', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--find', 'one', '--replace', 'yeah', fixturePath, '--view', 'long' ]
@@ -199,7 +199,7 @@ runner.test('cli: simple, long view', function () {
   a.deepStrictEqual(fs.existsSync(`${testRoot}/${this.index}/yeah`), true)
 })
 
-runner.test('cli: --index-root', function () {
+tom.test('--index-root', function () {
   const fixturePath = createFixture(`${testRoot}/${this.index}/one`)
   const origArgv = process.argv
   process.argv = [ 'node', 'test', '--index-root', '10', '--find', 'one', '--replace', 'yeah{{index}}', fixturePath ]
